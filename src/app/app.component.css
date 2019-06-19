@@ -1,0 +1,25 @@
+.mapContainer {
+    border:1px solid gray;
+    width: 700px;
+    height: 700px;
+}
+
+::ng-deep .background {
+    fill: white;
+    pointer-events: all; 
+}
+
+::ng-deep .feature {
+    stroke: rgba(204, 204, 204, 0.7);
+    fill: #fff;
+    cursor: pointer;
+    border-collapse: collapse;
+}
+
+::ng-deep .active {
+    fill: rgb(255, 165, 0, 0.3);
+}
+  
+::ng-deep .mesh {
+    stroke: orange;
+}

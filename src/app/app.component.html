@@ -1,0 +1,5 @@
+<select class='countrySelector' (change)="onSelect($event)">
+  <option selected></option>
+  <option *ngFor="let country of countries">{{ country.name }}</option>
+</select>
+<div class='mapContainer' #mapContainer></div>
