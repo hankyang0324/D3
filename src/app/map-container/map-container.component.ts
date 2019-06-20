@@ -70,16 +70,22 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
     if(this.zoomable) {
       this.svg.call(this.zoom)// delete this line to disable free zooming
     }
-    this.promise.then(
-      () => {
-        const selectCountry = this.g.selectAll("path")
+    this.promise.then(() => {
+      const selectCountry = 
+      this.g.selectAll("path")
           .data(this.countries).enter()
           .append("path")
           .attr("d", this.path)
-          .on("mousemove", this.mousemove.bind(this))
-          .on("mouseout", () => this.tooltip.style("display", "none"))
-          .attr("class", "feature")
-          .attr("id", (d:any) => {return 'id' + d.id}) //set id for each country path
+          .on("mousemove", (d:any) => 
+            this.tooltip
+                .style("display", "block")
+                .style("left", (d3.event.pageX + 10) + "px")   
+                .style("top", (d3.event.pageY + 10) + "px") 
+                .html(d.name))
+          .on("mouseout", () => 
+            this.tooltip.style("display", "none"))
+                .attr("class", "feature")
+                .attr("id", (d:any) => 'id' + d.id) //set id for each country path
         if(this.clickable){
           selectCountry.on("click", this.clicked.bind(this)); // delete this line to disable free click
         }
@@ -88,7 +94,7 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
     )
   }
 
-  ready(data) {
+  ready(data:any) {
     this.world = data[0];
     this.countries = (<any>topojson.feature(data[0], data[0].objects.countries)).features;
     this.countries = this.countries.filter((d: any) => {  //add country name from csv
@@ -99,17 +105,7 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
         }
       })
     });
-    this.countries.sort((a: any, b: any) => { 
-      return a.name > b.name ? 1 : -1;
-    })
-  }
-
-  mousemove(d:any) {
-    this.tooltip
-        .style("display", "block")
-        .style("left", (d3.event.pageX + 10) + "px")   
-        .style("top", (d3.event.pageY + 10) + "px") 
-        .html(d.name);
+    this.countries.sort((a: any, b: any) => a.name > b.name ? 1 : -1)
   }
 
   clicked(d:any) {
@@ -131,9 +127,9 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
         translate = [this.width / 2 - scale * x, this.height / 2 - scale * y];
     this.svg.transition() 
         .duration(1000)
-        .call( this.zoom.transform, d3.zoomIdentity.translate(translate[0],translate[1]).scale(scale) );
+        .call( this.zoom.transform, d3.zoomIdentity.translate(translate[0],translate[1]).scale(scale));
     this.g.append("path")
-        .datum(topojson.mesh(this.world, this.world.objects.countries, (a, b) => { return a.id === d.id || b.id === d.id; })) //highlight borders including mutual borders
+        .datum(topojson.mesh(this.world, this.world.objects.countries, (a, b) => a.id === d.id || b.id === d.id)) //highlight borders including mutual borders
         .attr("d", this.path)
         .attr("fill","none")
         .attr("class", "mesh"); //set selected country border color
