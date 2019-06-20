@@ -1,5 +1,10 @@
-<select class='countrySelector' (change)="onSelect($event)">
-  <option selected></option>
-  <option *ngFor="let country of countries">{{ country.name }}</option>
-</select>
-<div class='mapContainer' #mapContainer></div>
+<app-map-container
+  width = 1000
+  height = 800
+  country = China
+  [clickable] = true
+  [zoomable] = false
+  [showSelector] = true
+  [escZoomOut] = true
+  (selectedCountry) = 'show($event)'></app-map-container>
+<p>{{ selected }}</p>

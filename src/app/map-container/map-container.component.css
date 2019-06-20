@@ -1,0 +1,40 @@
+.countrySelector {
+    margin-bottom: 10px;
+}
+.mapContainer {
+    border:1px solid  rgba(204, 204, 204, 0.7);
+    width: 800px;
+    height: 800px;
+}
+
+::ng-deep .background {
+    fill: white;
+    pointer-events: all; 
+}
+
+::ng-deep .feature {
+    stroke: rgba(204, 204, 204, 0.7);
+    fill: #fff;
+    cursor: pointer;
+    border-collapse: collapse;
+}
+
+::ng-deep .active {
+    fill: rgb(255, 165, 0, 0.3);
+}
+  
+::ng-deep .mesh {
+    stroke: orange;
+}
+
+::ng-deep .tooltip { 
+    position: absolute;     
+    text-align: center;          
+    padding: 5px 10px;       
+    font: 12px sans-serif;    
+    background: rgb(240, 240, 240); 
+    border: 1px solid lightgrey;     
+    border-radius: 5px;   
+    pointer-events: none;    
+    opacity: 0.7; 
+}
