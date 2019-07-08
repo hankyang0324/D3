@@ -178,6 +178,7 @@ export class LineChartComponent implements OnInit, AfterContentInit {
     // Fix for format values
     const formatSi = d3.format('.2s');
     function formatAbbreviation(x) {
+      if(x === 0) return 0;
       const s = formatSi(x);
       switch (s[s.length - 1]) {
         case 'G': return s.slice(0, -1) + 'B';
