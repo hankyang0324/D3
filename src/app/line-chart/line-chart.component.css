@@ -1,0 +1,52 @@
+::ng-deep .axisLabel {
+    font: 16px sans-serif;
+}
+  
+::ng-deep .axis {
+    font: 10px sans-serif;
+}
+
+::ng-deep .axis line, 
+::ng-deep .axis path {
+    fill: none;
+    stroke: lightgray;
+    stroke-width: 2px;
+}
+
+::ng-deep .legend text {
+    font: 12px sans-serif;
+}
+  
+
+::ng-deep .focus circle {
+    fill: white;
+    stroke-width: 3px;
+}
+
+::ng-deep .focus text {
+    font: 12px sans-serif;
+}
+
+::ng-deep .overlay {
+    fill: none;
+    pointer-events: all;
+}
+
+::ng-deep .line {
+    fill: none;
+    stroke-width: 2px;
+}
+
+::ng-deep .dateTip text {
+    font: 12px sans-serif;
+}
+
+::ng-deep .dateTip .hover-line {
+    stroke: gray;
+    stroke-width: 1px;
+    stroke-dasharray: 3 3;
+}
+
+.hide {
+    display: none;
+}

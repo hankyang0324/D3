@@ -1,10 +1,21 @@
-<app-map-container
-  width = 1000
-  height = 800
-  country = China
-  [clickable] = true
-  [zoomable] = false
-  [showSelector] = true
-  [escZoomOut] = true
-  (selectedCountry) = 'show($event)'></app-map-container>
-<p>{{ selected }}</p>
+<div (window:resize)="onResize($event)">
+  <app-line-chart
+    width = 1000
+    height = 300
+    dataUrl = 'assets/coins.json'
+    yValue = price_usd
+    [showBrush] = true>
+  </app-line-chart>
+  <br><br>
+  <app-map-container
+    [width] = "width"
+    [height] = "width*0.7"
+    country = China
+    [clickable] = true
+    [scalable] = false
+    [showSelector] = true
+    [escZoomOut] = true
+    [resizable] = false
+    (selectedCountry) = 'show($event)'></app-map-container>
+  <p>{{ selected }}</p>
+</div>

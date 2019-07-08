@@ -10,10 +10,11 @@ import * as topojson from 'topojson';
 export class MapContainerComponent implements OnInit, AfterContentInit {
   @Input() width: any = 800;
   @Input() height: any = 800;
-  @Input() zoomable: boolean = true;
+  @Input() scalable: boolean = true;
   @Input() clickable: boolean = true;
   @Input() showSelector: boolean = true;
-  @Input() escZoomOut: boolean = true;
+  @Input() escZoomOut: boolean = false;
+  @Input() resizable: boolean = false;
   @Input() country: string = '';
   @Output() selectedCountry = new EventEmitter<string>();
   svg: any;
@@ -27,7 +28,6 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
   select: any;
   promise: Promise<any>;
   countryName: string = '';
-  @ViewChild('mapContainer') mapContainer: ElementRef;
   @HostListener('document:keydown', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) { 
     if(event.key === 'Escape' && this.escZoomOut) {
@@ -46,7 +46,7 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
     this.promise.then((data:any) => this.ready(data));
   }
   
-  ngAfterContentInit() {
+  ngAfterContentInit() { 
     this.projection = d3.geoMercator()
         .scale(this.width/6.3)
         .translate([this.width / 2, this.height / 1.6])
@@ -67,7 +67,7 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
         .attr("height", "100%")
         .on("click", this.reset.bind(this));
     this.g = this.svg.append("g");
-    if(this.zoomable) {
+    if(this.scalable) {
       this.svg.call(this.zoom)// delete this line to disable free zooming
     }
     this.promise.then(() => {
@@ -76,20 +76,22 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
           .data(this.countries).enter()
           .append("path")
           .attr("d", this.path)
+          .attr("class", "feature")
+          .attr("id", (d:any) => 'id' + d.id) //set id for each country path
           .on("mousemove", (d:any) => 
             this.tooltip
                 .style("display", "block")
-                .style("left", (d3.event.pageX + 10) + "px")   
-                .style("top", (d3.event.pageY + 10) + "px") 
+                .style("position", "fixed")
+                .style("left", (d3.event.pageX + 20) + "px")   
+                .style("top", (d3.event.pageY - window.scrollY + 20) + "px") 
                 .html(d.name))
           .on("mouseout", () => 
             this.tooltip.style("display", "none"))
-                .attr("class", "feature")
-                .attr("id", (d:any) => 'id' + d.id) //set id for each country path
         if(this.clickable){
           selectCountry.on("click", this.clicked.bind(this)); // delete this line to disable free click
-        }
-        this.onSelect(this.country);    
+        } 
+        this.onSelect(this.country); 
+        document.querySelector('select').style.maxWidth = this.width + 'px';  
       }
     )
   }
@@ -109,7 +111,7 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
   }
 
   clicked(d:any) {
-    d3.selectAll("path").classed("mesh",false); //reset mesh border color
+    d3.selectAll("path").classed("mesh", false); //reset mesh border color
     d3.selectAll("path").classed("active", false); //reset country fill color
     d3.select('#id'+d.id).classed("active", true); //set newly selected country fill color
     var bounds = this.path.bounds(d);
@@ -123,7 +125,7 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
         dy = bounds[1][1] - bounds[0][1],
         x = (bounds[0][0] + bounds[1][0]) / 2,
         y = (bounds[0][1] + bounds[1][1]) / 2,
-        scale = Math.max(1, Math.min(7, 0.8 / Math.max(dx / this.width, dy / this.height))),
+        scale = Math.max(1, Math.min(8, 0.8 / Math.max(dx / this.width, dy / this.height))),
         translate = [this.width / 2 - scale * x, this.height / 2 - scale * y];
     this.svg.transition() 
         .duration(1000)
@@ -153,7 +155,15 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
 
   stopped() {
     if (d3.event.defaultPrevented) {
-      d3.event.stopPropagation()
+      d3.event.stopPropagation();
+    }
+  }
+
+  onResize() {
+    if(this.resizable) {
+      d3.select(".mapContainer").html('');
+      this.ngOnInit();
+      this.ngAfterContentInit();
     }
   }
 

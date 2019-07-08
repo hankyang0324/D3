@@ -4,11 +4,13 @@ import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { MapContainerComponent } from './map-container/map-container.component';
+import { LineChartComponent } from './line-chart/line-chart.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    MapContainerComponent
+    MapContainerComponent,
+    LineChartComponent
   ],
   imports: [
     BrowserModule,

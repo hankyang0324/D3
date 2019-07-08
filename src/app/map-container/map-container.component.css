@@ -3,8 +3,6 @@
 }
 .mapContainer {
     border:1px solid  rgba(204, 204, 204, 0.7);
-    width: 800px;
-    height: 800px;
 }
 
 ::ng-deep .background {
@@ -20,15 +18,14 @@
 }
 
 ::ng-deep .active {
-    fill: rgb(255, 165, 0, 0.3);
+    fill: rgba(255, 165, 0, 0.3);
 }
   
 ::ng-deep .mesh {
     stroke: orange;
 }
 
-::ng-deep .tooltip { 
-    position: absolute;     
+::ng-deep .tooltip {   
     text-align: center;          
     padding: 5px 10px;       
     font: 12px sans-serif;    

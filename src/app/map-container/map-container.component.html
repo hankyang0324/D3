@@ -6,9 +6,9 @@
     <option selected></option>
     <option *ngFor="let country of countries">{{ country.name }}</option>
 </select>
-<div 
+<div
+  (window:resize)='onResize()'
   class='mapContainer' 
-  [ngStyle]='{width: width + "px", height: height + "px"}'
-  #mapContainer>
+  [ngStyle]='{width: width + "px", height: height + "px"}'>
 </div>
   

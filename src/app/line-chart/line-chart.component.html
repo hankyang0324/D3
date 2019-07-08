@@ -1,0 +1,10 @@
+<div>
+  <select [value]="yValue" (change)="onSelect($event.target.value)">
+    <option *ngFor="let yValue of yValues"> {{yValue}} </option>
+  </select>
+  <br><br>
+</div>
+<div class="chart">
+  <div id="chart-area"></div>  
+  <div id="slider-area" [ngClass]="{'hide':!showBrush}"></div>
+</div>
