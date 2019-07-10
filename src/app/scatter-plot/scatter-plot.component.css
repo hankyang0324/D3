@@ -1,0 +1,51 @@
+::ng-deep .axisLabel {
+    font: 16px sans-serif;
+}
+  
+::ng-deep .axis {
+    font: 10px sans-serif;
+}
+
+::ng-deep .axis line, 
+::ng-deep .axis path {
+    fill: none;
+    stroke: lightgray;
+    stroke-width: 2px;
+}
+
+::ng-deep .legend text {
+    font: 12px sans-serif;
+}
+
+::ng-deep .reference-line {
+    stroke: rgba(211, 211, 211, 0.4);
+    stroke-width: 1px;
+}
+
+::ng-deep .spot {
+    fill: rgba(100, 149, 237, 0.15);
+    cursor: pointer;
+}
+
+::ng-deep .hover-spot {
+    fill: rgb(139, 211, 255);
+    stroke: rgba(135, 206, 250, 0.5);
+    stroke-width: 8px;
+}
+
+::ng-deep .select-spot {
+    fill: rgba(255, 165, 0, 1);
+    stroke: rgba(255, 165, 0, 0.5);
+    stroke-width: 8px;
+}
+
+::ng-deep .scatter-plot-tooltip .hover-line {
+    stroke: gray;
+    stroke-width: 2px;
+    stroke-dasharray: 3 3;
+}
+
+::ng-deep .scatter-plot-tooltip text{
+    font: 14px sans-serif;
+}
+  

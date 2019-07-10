@@ -4,18 +4,26 @@
     height = 300
     dataUrl = 'assets/coins.json'
     yValue = price_usd
-    [showBrush] = true>
+    [showBrush] = true
+    [showSelect] = true>
   </app-line-chart>
+  <br><br>
+  <app-scatter-plot
+    dataUrl = 'assets/countriesScatterPlot.json'
+    [defaultSpot]="selectedSpot"
+    (selectedSpot)="onSelectedSpot($event)">
+  </app-scatter-plot>
   <br><br>
   <app-map-container
     [width] = "width"
-    [height] = "width*0.7"
-    country = China
+    [height] = "width*0.8"
+    [country] = "selectedSpot"
     [clickable] = true
     [scalable] = false
     [showSelector] = true
     [escZoomOut] = true
     [resizable] = false
-    (selectedCountry) = 'show($event)'></app-map-container>
+    (selectedCountry) = "onSelectedSpot($event)">
+  </app-map-container>
   <p>{{ selected }}</p>
 </div>

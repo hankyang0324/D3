@@ -1,4 +1,4 @@
-import { Component, AfterContentInit, ViewChild, ElementRef, OnInit, Input, Output, EventEmitter, HostListener} from '@angular/core';
+import { Component, AfterContentInit, OnInit, Input, Output, EventEmitter, HostListener} from '@angular/core';
 import * as d3 from 'd3';
 import * as topojson from 'topojson';
 
@@ -15,7 +15,14 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
   @Input() showSelector: boolean = true;
   @Input() escZoomOut: boolean = false;
   @Input() resizable: boolean = false;
-  @Input() country: string = '';
+  country: string = '';
+  @Input('country') 
+  set setCountry(value: string) {
+    this.country = value;
+    if(this.svg) {
+      this.onSelect(this.country);
+    }
+  }
   @Output() selectedCountry = new EventEmitter<string>();
   svg: any;
   tooltip: any;
@@ -36,17 +43,17 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
   }
 
   ngOnInit() {
-    this.height = parseInt(this.height);
-    this.width = parseInt(this.width);
-    if(this.height > this.width) {
-      this.height = this.width;
-    }
     const arr = [d3.json("../assets/world-50m.json"), d3.csv("../assets/countryIdName.csv")];
     this.promise = Promise.all(arr);
     this.promise.then((data:any) => this.ready(data));
   }
   
   ngAfterContentInit() { 
+    this.height = parseInt(this.height);
+    this.width = parseInt(this.width);
+    if(this.height > this.width) {
+      this.height = this.width;
+    }
     this.projection = d3.geoMercator()
         .scale(this.width/6.3)
         .translate([this.width / 2, this.height / 1.6])
@@ -58,13 +65,13 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
         .attr("class", "tooltip")       
         .style("display", "none");
     this.svg = d3.select(".mapContainer").append("svg")
-        .attr("width", "100%")
-        .attr("height", "100%")
+        .attr("width", this.width)
+        .attr("height", this.height)
         .on("click", this.stopped, true);
     this.svg.append("rect")
         .attr("class", "background")
-        .attr("width", "100%")
-        .attr("height", "100%")
+        .attr("width", this.width)
+        .attr("height", this.height)
         .on("click", this.reset.bind(this));
     this.g = this.svg.append("g");
     if(this.scalable) {
@@ -112,13 +119,13 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
 
   clicked(d:any) {
     d3.selectAll("path").classed("mesh", false); //reset mesh border color
-    d3.selectAll("path").classed("active", false); //reset country fill color
-    d3.select('#id'+d.id).classed("active", true); //set newly selected country fill color
+    d3.selectAll("path").classed("countryActive", false); //reset country fill color
+    d3.select('#id'+d.id).classed("countryActive", true); //set newly selected country fill color
     var bounds = this.path.bounds(d);
     switch(d.id) { //special zooming cases
       case 152: bounds[0][0] = bounds[1][0]; break; //chile
       case 528: bounds[0][0] = bounds[1][0]; bounds[1][1] = bounds[0][1]; break; //netherlands
-      case 250: bounds[0][0] = bounds[1][0] = (bounds[0][0] + bounds[1][0]) / 2; bounds[1][1] = bounds[1][1] / 1.43; break; //france
+      case 250: bounds[0][0] = bounds[1][0] = (bounds[0][0] + bounds[1][0]) / 1.95; bounds[1][1] = bounds[0][1] + this.height / 19; break; //france
       case 840: bounds[1][0] = bounds[1][0] / 3.63; break; //amercia
     }
     var dx = bounds[1][0] - bounds[0][0],
@@ -146,8 +153,8 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
 
   reset() { //reset map color and zoom
     if(!this.clickable) return;
-    d3.selectAll("path").classed("mesh",false);
-    d3.selectAll("path").classed("active", false);
+    d3.selectAll("path").classed("mesh", false);
+    d3.selectAll("path").classed("countryActive", false);
     this.svg.transition().duration(1000).call(this.zoom.transform, d3.zoomIdentity);
     this.countryName = '';
     this.selectedCountry.emit('');
@@ -169,8 +176,8 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
 
   onSelect(value:string) {
     if (value === '' || value === null) {
-      d3.selectAll("path").classed("mesh",false);
-      d3.selectAll("path").classed("active", false);
+      d3.selectAll("path").classed("mesh", false);
+      d3.selectAll("path").classed("countryActive", false);
       this.svg.transition().duration(1000).call(this.zoom.transform, d3.zoomIdentity);
       this.countryName = '';
       this.selectedCountry.emit('');
@@ -179,7 +186,6 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
     this.g.selectAll('path').filter((d: any) => {
       if (d.name === value) {
         this.clicked(d);
-        // console.log(d);
       }
     });
   }

@@ -6,15 +6,15 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit{
-  selected:string = '';
-  width: number = 900;
+  selectedSpot = 'Chile';
+  width: number = 800;
 
   ngOnInit(){
     // this.width = document.querySelector('body').offsetWidth;
   }
 
-  show(value:string){
-    this.selected = value;
+  onSelectedSpot(value: string){
+    this.selectedSpot = value;
   }
 
   onResize(event) {

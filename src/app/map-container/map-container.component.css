@@ -3,6 +3,7 @@
 }
 .mapContainer {
     border:1px solid  rgba(204, 204, 204, 0.7);
+    margin: 0;
 }
 
 ::ng-deep .background {
@@ -17,7 +18,7 @@
     border-collapse: collapse;
 }
 
-::ng-deep .active {
+::ng-deep .countryActive {
     fill: rgba(255, 165, 0, 0.3);
 }
   
