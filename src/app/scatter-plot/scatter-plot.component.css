@@ -23,12 +23,22 @@
 }
 
 ::ng-deep .spot {
-    fill: rgba(100, 149, 237, 0.15);
+    fill: rgba(139, 211, 255, 0.3);
     cursor: pointer;
 }
 
+::ng-deep .default-spot {
+    fill: rgba(255, 165, 0, 0.6);
+}
+
+::ng-deep .default-spot-hover {
+    fill: rgba(255, 165, 0, 1);
+    stroke: rgba(255, 165, 0, 0.5);
+    stroke-width: 8px;
+}
+
 ::ng-deep .hover-spot {
-    fill: rgb(139, 211, 255);
+    fill: rgba(139, 211, 255, 1);
     stroke: rgba(135, 206, 250, 0.5);
     stroke-width: 8px;
 }

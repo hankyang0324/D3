@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterContentInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterContentInit, Input, OnDestroy, ElementRef } from '@angular/core';
 import * as d3 from 'd3';
 
 @Component({
@@ -55,7 +55,7 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
   promise: any;
   t = () => d3.transition().duration(1000);
 
-  constructor() { }
+  constructor(private container: ElementRef) {}
 
   ngOnInit() {
     this.loadData();
@@ -89,11 +89,13 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
     this.x2 = d3.scaleTime().range([0, this.width2]);
     this.y2 = d3.scaleLinear().range([this.height2, 0]);
     this.xRange = [this.parseTime(this.xValueRange[0]).getTime(), this.parseTime(this.xValueRange[1]).getTime()];
-    this.svg = d3.select('#chart-area')
+    this.svg = d3.select(this.container.nativeElement)
+      .select('#chart-area')
       .append('svg')
       .attr('width', this.width + this.margin.left + this.margin.right)
       .attr('height', this.height + this.margin.top + this.margin.bottom);
-    this.svg2 = d3.select('#slider-area')
+    this.svg2 = d3.select(this.container.nativeElement)
+      .select('#slider-area')
       .append('svg')
       .attr('width', this.width2 + this.margin2.left + this.margin2.right)
       .attr('height', this.height2 + this.margin2.top + this.margin2.bottom);
@@ -215,9 +217,9 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
     //Update rangelable
     this.rangeLabel.text('Date: ' + this.formatTime(new Date(this.xRange[0])) + ' ~ ' + this.formatTime(new Date(this.xRange[1])));
     // Clear old chart
-    d3.selectAll('.line').remove();
-    d3.selectAll('.dateTip').remove();
-    d3.selectAll('.focus').remove();
+    this.svg.selectAll('.line').remove();
+    this.svg.selectAll('.dateTip').remove();
+    this.svg.selectAll('.focus').remove();
     // Path generator
     const line = d3.line()
       .x(d => this.x(d[this.xValue]))
@@ -242,7 +244,8 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
     this.yLabel.text(this.yValue);
     // Date Tooltip code
     const dateTip = this.g.append('g')
-      .attr('class', 'dateTip');
+      .attr('class', 'dateTip')
+      .style('display', 'none');
     dateTip.append('line')
       .attr('class', 'x-hover-line hover-line')
       .attr('y1', 0)
@@ -258,6 +261,7 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
     const tooltips = focuses.enter()
       .append('g')
       .attr('class', 'focus')
+      .style('display','none')
       .attr('transform', 'translate(' + 0 + ', ' + this.height + ')')
     tooltips.append('circle')
       .attr('r', 5)
@@ -279,6 +283,7 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
         const d2 = selectDate(dataTimeFiltered[0], x0);
         return 'translate(' + this.x(d2[xValue]) + ',' + 0 + ')';
       })
+        .style('display','unset')
         .select('text')
         .text(() => {
           const d2 = selectDate(dataTimeFiltered[0], x0);
@@ -288,6 +293,7 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
         const d2 = selectDate(d, x0);
         return 'translate(' + this.x(d2[xValue]) + ',' + this.y(d2[this.yValue]) + ')';
       })
+        .style('display','unset')
         .select('text')
         .text((d) => {
           const d2 = selectDate(d, x0);
@@ -320,8 +326,8 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
     this.xAxisCall2.scale(this.x2);
     this.xAxis2.transition(this.t()).call(this.xAxisCall2);
     // Clear old chart
-    d3.selectAll('.area').remove();
-    d3.selectAll('.brush').remove();
+    this.svg2.selectAll('.area').remove();
+    this.svg2.selectAll('.brush').remove();
     // Path generator
     const area = d3.area()
       .x(d => this.x2(d[this.xValue]))

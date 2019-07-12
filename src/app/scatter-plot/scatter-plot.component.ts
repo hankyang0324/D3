@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterContentInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, AfterContentInit, Input, Output, EventEmitter, ElementRef } from '@angular/core';
 import * as d3 from 'd3';
 
 @Component({
@@ -8,15 +8,17 @@ import * as d3 from 'd3';
 })
 export class ScatterPlotComponent implements OnInit, AfterContentInit {
   @Output() selectedSpot = new EventEmitter<string>();
-  defaultSpot:string;
-  @Input('defaultSpot') 
+  defaultSpot: string;
+  checkSpot: string; // For checking if the input spot is valid
+  @Input('defaultSpot')
   set setDefaultSpot(value: string) {
-    this.defaultSpot = value;
-    const result = this.filteredData.find( d => d.id === this.defaultSpot);
-    if(result) {
+    this.checkSpot = value;
+    const result = this.filteredData.find(d => d.id === this.checkSpot);
+    if (result) {
+      this.defaultSpot = this.checkSpot;
       this.mouseover(result);
     }
-  };
+  }
   @Input('height') setHeight = 400;
   @Input('width') setWidth = 480;
   @Input('color') setColor = 'steelblue';
@@ -50,7 +52,7 @@ export class ScatterPlotComponent implements OnInit, AfterContentInit {
   promise: any;
   t = () => d3.transition().duration(1000);
 
-  constructor() { }
+  constructor(private container: ElementRef) {}
 
   ngOnInit() {
     this.loadData();
@@ -73,7 +75,8 @@ export class ScatterPlotComponent implements OnInit, AfterContentInit {
     this.color = this.setColor;
     this.x = d3.scaleLinear().range([0, this.width]);
     this.y = d3.scaleLinear().range([this.height, 0]);
-    this.svg = d3.select('#scatter-plot-area')
+    this.svg = d3.select(this.container.nativeElement)
+      .select('#scatter-plot-area')
       .append('svg')
       .attr('width', this.width + this.margin.left + this.margin.right)
       .attr('height', this.height + this.margin.top + this.margin.bottom);
@@ -113,8 +116,8 @@ export class ScatterPlotComponent implements OnInit, AfterContentInit {
       .attr('y2', this.height / 2)
     this.g.append('line')
       .attr('class', 'reference-line')
-      .attr('x1', this.width /2)
-      .attr('x2', this.width /2)
+      .attr('x1', this.width / 2)
+      .attr('x2', this.width / 2)
       .attr('y1', 0)
       .attr('y2', this.height);
     this.g.append('line')
@@ -127,7 +130,7 @@ export class ScatterPlotComponent implements OnInit, AfterContentInit {
     this.promise.then(data => {
       this.filteredData = data;
       this.filteredData.forEach(d => {
-        for(const prop in d) {
+        for (const prop in d) {
           d[prop] = +d[prop] + '' !== 'NaN' ? +d[prop] : d[prop];
         }
       })
@@ -141,12 +144,12 @@ export class ScatterPlotComponent implements OnInit, AfterContentInit {
     this.xRange[0] = this.xRange[0] < xRangeNew[0] ? this.xRange[0] : xRangeNew[0];
     this.xRange[1] = this.xRange[1] > xRangeNew[1] ? this.xRange[1] : xRangeNew[1];
     this.yRange[0] = this.yRange[0] < yRangeNew[0] ? this.yRange[0] : yRangeNew[0];
-    this.yRange[1] = this.yRange[1] > yRangeNew[1] ? this.yRange[1] : yRangeNew[1]; 
+    this.yRange[1] = this.yRange[1] > yRangeNew[1] ? this.yRange[1] : yRangeNew[1];
     this.x.domain(this.xRange);
     this.y.domain(this.yRange);
     // Fix for format values
     function formatAbbreviation(x) {
-      if(x === 0) return 0;
+      if (x === 0) return 0;
       return d3.format(',.0%')(x);
     }
     // Update axes
@@ -154,7 +157,10 @@ export class ScatterPlotComponent implements OnInit, AfterContentInit {
     this.xAxis.transition(this.t()).call(this.xAxisCall.tickFormat(formatAbbreviation));
     this.yAxisCall.scale(this.y);
     this.yAxis.transition(this.t()).call(this.yAxisCall.tickFormat(formatAbbreviation));
-    //tooltip
+    //Clear old chart
+    this.svg.selectAll('.spot').remove();
+    this.svg.selectAll('.scatter-plot-tooltip').remove();
+    // Update tooltip
     this.tooltip = this.g.append('g')
       .attr('class', 'scatter-plot-tooltip');
     this.tooltip.append('line')
@@ -176,17 +182,25 @@ export class ScatterPlotComponent implements OnInit, AfterContentInit {
       .on('mouseover', this.mouseover.bind(this))
       .on('mousedown', this.mousedown.bind(this))
       .on('mouseup', this.mouseup.bind(this))
-      .on('mousemove', this.mouseup.bind(this));
+      .on('mousemove', this.mousemove.bind(this));
     // Default tooltip
-    const result = this.filteredData.find( d => d.id === this.defaultSpot);
-    if(result) {
+    const result = this.filteredData.find(d => d.id === this.checkSpot);
+    if (result) {
+      this.defaultSpot = this.checkSpot;
       this.mouseover(result);
     }
   }
 
   mouseover(d) {
     this.g.selectAll('.spot').classed('hover-spot', false);
-    this.g.select('#id_' + d.id.split(' ').join('_')).classed('hover-spot', true);
+    this.g.selectAll('.spot').classed('default-spot-hover', false);
+    if (d.id === this.defaultSpot) {
+      this.g.selectAll('.spot').classed('default-spot', false);
+      this.g.select('#id_' + d.id.split(' ').join('_')).classed('default-spot', true);
+      this.g.select('#id_' + d.id.split(' ').join('_')).classed('default-spot-hover', true);
+    } else {
+      this.g.select('#id_' + d.id.split(' ').join('_')).classed('hover-spot', true);
+    }
     this.tooltip.attr('transform', 'translate(' + this.x(d[this.xValue]) + ',' + 0 + ')');
     this.tooltip.select('line')
       .attr('y1', this.y(d[this.yValue]))
@@ -197,10 +211,15 @@ export class ScatterPlotComponent implements OnInit, AfterContentInit {
 
   mousedown(d) {
     this.g.select('#id_' + d.id.split(' ').join('_')).classed('select-spot', true);
-    this.selectedSpot.emit(d.id);
   }
 
   mouseup(d) {
+    this.defaultSpot = d.id;
+    this.selectedSpot.emit(d.id);
+    this.g.select('#id_' + d.id.split(' ').join('_')).classed('select-spot', false);
+  }
+
+  mousemove(d) {
     this.g.select('#id_' + d.id.split(' ').join('_')).classed('select-spot', false);
   }
 

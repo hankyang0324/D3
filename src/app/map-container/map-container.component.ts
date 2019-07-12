@@ -1,4 +1,4 @@
-import { Component, AfterContentInit, OnInit, Input, Output, EventEmitter, HostListener} from '@angular/core';
+import { Component, AfterContentInit, OnInit, Input, Output, EventEmitter, HostListener, ElementRef} from '@angular/core';
 import * as d3 from 'd3';
 import * as topojson from 'topojson';
 
@@ -42,6 +42,8 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
     }
   }
 
+  constructor(private container: ElementRef) {}
+
   ngOnInit() {
     const arr = [d3.json("../assets/world-50m.json"), d3.csv("../assets/countryIdName.csv")];
     this.promise = Promise.all(arr);
@@ -64,7 +66,8 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
         .append("div") 
         .attr("class", "tooltip")       
         .style("display", "none");
-    this.svg = d3.select(".mapContainer").append("svg")
+    this.svg = d3.select(this.container.nativeElement)
+        .select(".mapContainer").append("svg")
         .attr("width", this.width)
         .attr("height", this.height)
         .on("click", this.stopped, true);
@@ -118,9 +121,9 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
   }
 
   clicked(d:any) {
-    d3.selectAll("path").classed("mesh", false); //reset mesh border color
-    d3.selectAll("path").classed("countryActive", false); //reset country fill color
-    d3.select('#id'+d.id).classed("countryActive", true); //set newly selected country fill color
+    this.svg.selectAll("path").classed("mesh", false); //reset mesh border color
+    this.svg.selectAll("path").classed("countryActive", false); //reset country fill color
+    this.svg.select('#id'+d.id).classed("countryActive", true); //set newly selected country fill color
     var bounds = this.path.bounds(d);
     switch(d.id) { //special zooming cases
       case 152: bounds[0][0] = bounds[1][0]; break; //chile

@@ -8,22 +8,24 @@
     [showSelect] = true>
   </app-line-chart>
   <br><br>
-  <app-scatter-plot
-    dataUrl = 'assets/countriesScatterPlot.json'
-    [defaultSpot]="selectedSpot"
-    (selectedSpot)="onSelectedSpot($event)">
-  </app-scatter-plot>
-  <br><br>
-  <app-map-container
-    [width] = "width"
-    [height] = "width*0.8"
-    [country] = "selectedSpot"
-    [clickable] = true
-    [scalable] = false
-    [showSelector] = true
-    [escZoomOut] = true
-    [resizable] = false
-    (selectedCountry) = "onSelectedSpot($event)">
-  </app-map-container>
-  <p>{{ selected }}</p>
+  <div style="display: inline-block">
+    <app-scatter-plot
+      dataUrl = 'assets/countriesScatterPlot.json'
+      [defaultSpot]="selectedSpot"
+      (selectedSpot)="onSelectedSpot($event)">
+    </app-scatter-plot>
+  </div>
+  <div style="display: inline-block">
+    <app-map-container
+      [width] = "width"
+      [height] = "width"
+      [country] = "selectedSpot"
+      [clickable] = true
+      [scalable] = false
+      [showSelector] = true
+      [escZoomOut] = true
+      [resizable] = false
+      (selectedCountry) = "onSelectedSpot($event)">
+    </app-map-container>
+  </div>
 </div>
