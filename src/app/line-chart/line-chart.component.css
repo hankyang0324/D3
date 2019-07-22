@@ -1,3 +1,16 @@
+.select {
+    position: relative;
+    top: 35px;
+    margin-left: 80px;
+}
+.date-picker {
+    position: relative;
+    top: 42px;
+    float: right;
+    margin-right: 100px;
+    font: 12px sans-serif;
+}
+
 :host ::ng-deep .button-group {
     font: 12px sans-serif;
 }

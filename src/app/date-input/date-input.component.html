@@ -1,0 +1,12 @@
+<input type='text' 
+  class='dateInput'
+  [ngModel]='date'
+  (ngModelChange)='detectChange($event)'
+  (keydown.enter)='onBlur($event)'
+  (click)='onClick()'
+  (blur)='onBlur($event)'
+  [disabled]='disabled'
+  [ngClass]='{disable:disabled}'
+  [ngStyle]='{width:width}'
+  placeholder='mm/dd/yyyy'
+  testDirective>

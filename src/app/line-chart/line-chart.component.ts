@@ -18,7 +18,7 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
   @Input() yValue;
   @Input('xRange') xValueRange = ['14/5/2013', '13/5/2017'];
   yValues = [];
-  margin = { left: 80, right: 100, top: 50, bottom: 50 };
+  margin = { left: 80, right: 100, top: 60, bottom: 40 };
   height = 300 - this.margin.top - this.margin.bottom;
   width = 1000 - this.margin.left - this.margin.right;
   margin2 = { left: 80, right: 100, top: 0, bottom: 20 };
@@ -39,7 +39,6 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
   // Labels
   xLabel: any;
   yLabel: any;
-  rangeLabel: any;
   legend: any;
   // X-axis
   xAxisCall: any;
@@ -55,8 +54,12 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
   // Data
   filteredData = {};
   parseTime = d3.timeParse('%d/%m/%Y');
+  parseTime2 = d3.timeParse('%m/%d/%Y');
   formatTime = d3.timeFormat('%m/%d/%Y');
   xRange = [this.parseTime(this.xValueRange[0]).getTime(), this.parseTime(this.xValueRange[1]).getTime()];
+  dateBegin: any = this.formatTime(new Date(this.xRange[0]));
+  dateEnd:any = this.formatTime(new Date(this.xRange[1]));
+  diff = 0;
   promise: any;
   t = () => d3.transition().duration(1000);
 
@@ -94,6 +97,9 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
     this.x2 = d3.scaleTime().range([0, this.width2]);
     this.y2 = d3.scaleLinear().range([this.height2, 0]);
     this.xRange = [this.parseTime(this.xValueRange[0]).getTime(), this.parseTime(this.xValueRange[1]).getTime()];
+    d3.select(this.container.nativeElement)
+      .select('.chart')
+      .style('width',this.width + this.margin.left + this.margin.right + 'px');
     this.svg = d3.select(this.container.nativeElement)
       .select('#chart-area')
       .append('svg')
@@ -108,19 +114,19 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
       .attr('transform', 'translate(' + this.margin.left + ', ' + this.margin.top + ')');
     this.g2 = this.svg2.append('g')
       .attr('transform', 'translate(' + this.margin2.left + ',' + this.margin2.top + ')');
-    //buttons
-    this.buttonGroup = this.g.append('g')
+    // Buttons
+    this.buttonGroup = this.svg.append('g')
       .attr('class', 'button-group')
-      .attr('transform', 'translate(' + 0 + ', ' + -20 + ')')
+      .attr('transform', 'translate(' + 80 + ', ' + 33 + ')');
     this.buttonGroup.append('text')
       .text('Zoom');
-    var button = this.buttonGroup
+    let button = this.buttonGroup
       .append('g')
       .attr('class', 'button')
       .on('click', (d, i, n) => onClick.bind(this)(30, i, n));
     button.append('rect')
       .attr('x', '35')
-      .attr('y', '-13')
+      .attr('y', '-13');
     button.append('text')
       .attr('x', '41')
       .text('1m');
@@ -130,7 +136,7 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
       .on('click', (d, i, n) => onClick.bind(this)(91, i, n));
     button.append('rect')
       .attr('x', '70')
-      .attr('y', '-13')
+      .attr('y', '-13');
     button.append('text')
       .attr('x', '76')
       .text('3m');
@@ -140,7 +146,7 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
       .on('click', (d, i, n) => onClick.bind(this)(183, i, n));
     button.append('rect')
       .attr('x', '105')
-      .attr('y', '-13')
+      .attr('y', '-13');
     button.append('text')
       .attr('x', '111')
       .text('6m');
@@ -150,7 +156,7 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
       .on('click', (d, i, n) => onClick.bind(this)(365, i, n));
     button.append('rect')
       .attr('x', '140')
-      .attr('y', '-13')
+      .attr('y', '-13');
     button.append('text')
       .attr('x', '148')
       .text('1y');
@@ -160,26 +166,23 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
       .on('click', (d, i, n) => onClick.bind(this)(0, i, n));
     button.append('rect')
       .attr('x', '175')
-      .attr('y', '-13')
+      .attr('y', '-13');
     button.append('text')
       .attr('x', '183')
       .text('All');
     // Labels
     this.xLabel = this.g.append('text')
       .attr('class', 'x axisLabel')
-      .attr('y', this.height + 40)
+      .attr('y', this.height + 35)
       .attr('x', this.width / 2)
-      .attr('text-anchor', 'middle')
+      .attr('text-anchor', 'middle');
     this.yLabel = this.g.append('text')
       .attr('class', 'y axisLabel')
       .attr('y', -50)
       .attr('x', -this.height / 2)
       .attr('transform', 'rotate(-90)')
-      .attr('text-anchor', 'middle')
-    this.rangeLabel = this.g.append('text')
-      .attr('class', 'axisLabel')
-      .attr('y', -40);
-    //this.g.append('button').attr('type', 'button').attr('value','1m').attr('y', -30).text('fucl');
+      .attr('text-anchor', 'middle');
+    // This.g.append('button').attr('type', 'button').attr('value','1m').attr('y', -30).text('fucl');
     // X-axis
     this.xAxisCall = d3.axisBottom(null)
       .ticks(this.width / 125);
@@ -192,10 +195,10 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
       .attr('class', 'x axis')
       .attr('transform', 'translate(0,' + this.height2 + ')');
     // Y-axis
-    this.yAxisCall = d3.axisLeft(null)
+    this.yAxisCall = d3.axisLeft(null);
     this.yAxis = this.g.append('g')
       .attr('class', 'y axis');
-    //Load data
+    // Load data
     this.promise.then(data => {
       // Prepare and clean data
       const items = [];
@@ -229,7 +232,7 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
       this.legend = this.svg.selectAll('.legend')
         .data(items).enter()
         .append('g')
-        .attr('transform', (d, i) => 'translate(' + (this.width - 120 * (items.length - 1 - i)) + ',' + 20 + ')')
+        .attr('transform', (d, i) => 'translate(' + (this.width - 100 * (items.length - 1 - i)) + ',' + 5 + ')')
         .attr('class', 'legend');
       this.legend.append('circle')
         .attr('r', 5)
@@ -245,26 +248,31 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
       this.update();
     });
 
-    //time range buttons function
+    // Time range buttons function
     function onClick(d, i, n) {
       this.buttonGroup.selectAll('rect')
         .classed('button-selected', false);
       d3.select(n[i])
         .select('rect')
         .classed('button-selected', true);
-      if(d === 0) {
+      if (d === 0) {
         let end = this.x2.range().map(this.x2.invert)[1].setHours(23, 59, 59, 999);
         let begin = this.x2.range().map(this.x2.invert)[0].setHours(0, 0, 0, 0);
+        this.diff = end - begin;
         end = this.x2(end);
         begin = this.x2(begin);
         this.brushComponent.call(this.brush.move, [begin, end]);
       } else { 
         let end = this.xRange[1];
         let begin = end - 86400000 * d;
-        if( begin < this.x2.range().map(this.x2.invert)[0].setHours(0, 0, 0, 0)) {
+        if (begin < this.x2.range().map(this.x2.invert)[0].setHours(0, 0, 0, 0)) {
           begin = this.x2.range().map(this.x2.invert)[0].setHours(0, 0, 0, 0);
           end = begin + 86400000 * d;
         }
+        if ( end > this.x2.range().map(this.x2.invert)[1].setHours(23, 59, 59, 999)) {
+          end = this.x2.range().map(this.x2.invert)[1].setHours(23, 59, 59, 999);
+        }
+        this.diff = end - begin;
         end = this.x2(end);
         begin = this.x2(begin);
         this.brushComponent.call(this.brush.move, [begin, end]);
@@ -289,7 +297,9 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
     // Fix for format values
     const formatSi = d3.format('.2s');
     function formatAbbreviation(x) {
-      if (x === 0) return 0;
+      if (x === 0) {
+        return 0;
+      }
       const s = formatSi(x);
       switch (s[s.length - 1]) {
         case 'G': return s.slice(0, -1) + 'B';
@@ -302,8 +312,9 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
     this.xAxis.transition(this.t()).call(this.xAxisCall);
     this.yAxisCall.scale(this.y);
     this.yAxis.transition(this.t()).call(this.yAxisCall.tickFormat(formatAbbreviation));
-    //Update rangelable
-    this.rangeLabel.text('Date: ' + this.formatTime(new Date(this.xRange[0])) + ' ~ ' + this.formatTime(new Date(this.xRange[1])));
+    // Update rangelabel
+    this.dateBegin = this.formatTime(new Date(this.xRange[0]));
+    this.dateEnd = this.formatTime(new Date(this.xRange[1]));
     // Clear old chart
     this.svg.selectAll('.line').remove();
     this.svg.selectAll('.dateTip').remove();
@@ -387,7 +398,7 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
           const d2 = selectDate(d, x0);
           return d3.format('$,')(d2[this.yValue].toFixed(2));
         })
-      //Find the closest date against the mouse position
+      // Find the closest date against the mouse position
       function selectDate(data, x) {
         const bisectDate = d3.bisector(d => d[xValue]).left;
         const i = bisectDate(data, x, 1);
@@ -445,6 +456,11 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
     function brushed() {
       var selection = d3.event.selection || this.x2.range();
       this.xRange = selection.map(this.x2.invert);
+      if ( this.diff !== this.xRange[1] -this.xRange[0]) {
+        this.diff = this.xRange[1] -this.xRange[0];
+        this.buttonGroup.selectAll('rect')
+          .classed('button-selected', false);
+      }
       (this.xRange[0]).setHours(0, 0, 0, 0);
       (this.xRange[1]).setHours(23, 59, 59, 999);
       this.update();
@@ -452,6 +468,8 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
 
     function resetBrush() {
       this.xRange = [this.parseTime(this.xValueRange[0]).getTime(), this.parseTime(this.xValueRange[1]).getTime()];
+      this.buttonGroup.selectAll('rect')
+        .classed('button-selected', false);
       this.update();
     }
   }
@@ -460,6 +478,39 @@ export class LineChartComponent implements OnInit, AfterContentInit, OnDestroy {
     this.yValue = value;
     this.update2();
     this.update();
+  }
+
+  fetchDateBegin(value) {
+    const date = new Date(value);
+    if (date.getTime() >= this.parseTime(this.xValueRange[0]).getTime() 
+      && date.getTime() <= this.parseTime2(this.dateEnd).getTime()
+      && date.getTime() !== this.parseTime2(this.dateBegin).getTime()) {
+      this.dateBegin = value;
+      let begin = this.parseTime2(this.dateBegin).setHours(0, 0, 0, 0);
+      let end = this.parseTime2(this.dateEnd).setHours(23, 59, 59, 999);
+      begin = this.x2(begin);
+      end = this.x2(end);
+      this.brushComponent.call(this.brush.move, [begin, end]);
+    } else {
+      this.dateBegin = new String(this.dateBegin);
+    }
+
+  }
+
+  fetchDateEnd(value) {
+    const date = new Date(value);
+    if (date.getTime() <= this.parseTime(this.xValueRange[1]).getTime() 
+      && date.getTime() >= this.parseTime2(this.dateBegin).getTime()
+      && date.getTime() !== this.parseTime2(this.dateEnd).getTime()) {
+      this.dateEnd = value;
+      let begin = this.parseTime2(this.dateBegin).setHours(0, 0, 0, 0);
+      let end = this.parseTime2(this.dateEnd).setHours(23, 59, 59, 999);
+      begin = this.x2(begin);
+      end = this.x2(end);
+      this.brushComponent.call(this.brush.move, [begin, end]);
+    } else {
+      this.dateEnd = new String(this.dateEnd);
+    }
   }
 
   ngOnDestroy() {

@@ -1,10 +1,15 @@
-<div *ngIf="showSelect">
-  <select [value]="yValue" (change)="onSelect($event.target.value)">
-    <option *ngFor="let yValue of yValues"> {{yValue}} </option>
-  </select>
-  <br><br>
-</div>
 <div class="chart">
-  <div id="chart-area"></div>  
+  <div class="select" *ngIf="showSelect">
+    <select [value]="yValue" (change)="onSelect($event.target.value)">
+      <option *ngFor="let yValue of yValues"> {{yValue}} </option>
+    </select>
+  </div>
+  <div class="date-picker">
+    From
+    <app-date-input [date]="dateBegin" (getDate)='fetchDateBegin($event)'></app-date-input>
+    To
+    <app-date-input [date]="dateEnd" (getDate)='fetchDateEnd($event)'></app-date-input>
+  </div>
+  <div id="chart-area"></div>
   <div id="slider-area" [ngClass]="{'hide':!showBrush}"></div>
 </div>
