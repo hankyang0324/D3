@@ -1,50 +1,79 @@
-::ng-deep .axisLabel {
-    font: 16px sans-serif;
+:host ::ng-deep .button-group {
+    font: 12px sans-serif;
+}
+
+:host ::ng-deep .button rect {
+    height: 18px;
+    width: 30px;
+    cursor: pointer;
+    fill: lightgrey;
+    opacity: 0.3;
+}
+
+:host ::ng-deep .button text {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+:host ::ng-deep .button:hover rect {
+    fill: grey;
+}
+
+:host ::ng-deep .button:hover text {
+    opacity: 1;
+}
+
+:host ::ng-deep .axisLabel {
+    font: 14px sans-serif;
 }
   
-::ng-deep .axis {
+:host ::ng-deep .axis {
     font: 10px sans-serif;
 }
 
-::ng-deep .axis line, 
-::ng-deep .axis path {
+:host ::ng-deep .axis line, 
+:host ::ng-deep .axis path {
     fill: none;
     stroke: lightgray;
     stroke-width: 2px;
 }
 
-::ng-deep .legend text {
+:host ::ng-deep .legend text {
     font: 12px sans-serif;
 }
   
 
-::ng-deep .focus circle {
+:host ::ng-deep .focus circle {
     fill: white;
     stroke-width: 3px;
 }
 
-::ng-deep .focus text {
+:host ::ng-deep .focus text {
     font: 12px sans-serif;
 }
 
-::ng-deep .overlay {
+:host ::ng-deep .overlay {
     fill: none;
     pointer-events: all;
 }
 
-::ng-deep .line {
+:host ::ng-deep .line {
     fill: none;
     stroke-width: 2px;
 }
 
-::ng-deep .dateTip text {
+:host ::ng-deep .dateTip text {
     font: 12px sans-serif;
 }
 
-::ng-deep .dateTip .hover-line {
+:host ::ng-deep .dateTip .hover-line {
     stroke: gray;
     stroke-width: 1px;
     stroke-dasharray: 3 3;
+}
+
+:host ::ng-deep .button-selected {
+    fill: cornflowerblue !important;
 }
 
 .hide {

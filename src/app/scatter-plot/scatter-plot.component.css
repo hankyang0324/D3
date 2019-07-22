@@ -1,61 +1,63 @@
-::ng-deep .axisLabel {
-    font: 16px sans-serif;
+:host ::ng-deep .axisLabel {
+    font: 14px sans-serif;
 }
   
-::ng-deep .axis {
+:host ::ng-deep .axis {
     font: 10px sans-serif;
 }
 
-::ng-deep .axis line, 
-::ng-deep .axis path {
+:host ::ng-deep .axis line, 
+:host ::ng-deep .axis path {
     fill: none;
     stroke: lightgray;
     stroke-width: 2px;
 }
 
-::ng-deep .legend text {
+:host ::ng-deep .legend text {
     font: 12px sans-serif;
 }
 
-::ng-deep .reference-line {
+:host ::ng-deep .reference-line {
     stroke: rgba(211, 211, 211, 0.4);
     stroke-width: 1px;
 }
 
-::ng-deep .spot {
+:host ::ng-deep .spot {
     fill: rgba(139, 211, 255, 0.3);
     cursor: pointer;
 }
 
-::ng-deep .default-spot {
+:host ::ng-deep .default-spot {
     fill: rgba(255, 165, 0, 0.6);
 }
 
-::ng-deep .default-spot-hover {
+:host ::ng-deep .default-spot-hover {
     fill: rgba(255, 165, 0, 1);
     stroke: rgba(255, 165, 0, 0.5);
     stroke-width: 8px;
 }
 
-::ng-deep .hover-spot {
+:host ::ng-deep .hover-spot {
     fill: rgba(139, 211, 255, 1);
     stroke: rgba(135, 206, 250, 0.5);
     stroke-width: 8px;
 }
 
-::ng-deep .select-spot {
+:host ::ng-deep .select-spot {
     fill: rgba(255, 165, 0, 1);
     stroke: rgba(255, 165, 0, 0.5);
     stroke-width: 8px;
 }
 
-::ng-deep .scatter-plot-tooltip .hover-line {
+:host ::ng-deep .scatter-plot-tooltip .hover-line {
     stroke: gray;
     stroke-width: 2px;
     stroke-dasharray: 3 3;
 }
 
-::ng-deep .scatter-plot-tooltip text{
+:host ::ng-deep .scatter-plot-tooltip text{
     font: 14px sans-serif;
 }
+
+
   
