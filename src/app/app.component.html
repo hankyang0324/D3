@@ -10,6 +10,8 @@
   <br><br>
   <div style="display: inline-block">
     <app-scatter-plot
+      width = 400
+      height = 400
       dataUrl = 'assets/countriesScatterPlot.json'
       [defaultSpot]="selectedSpot"
       (selectedSpot)="onSelectedSpot($event)">
@@ -17,14 +19,13 @@
   </div>
   <div style="display: inline-block">
     <app-map-container
-      [width] = "width"
-      [height] = "width"
+      width = 400
+      height = 400
       [country] = "selectedSpot"
       [clickable] = true
       [scalable] = false
       [showSelector] = true
       [escZoomOut] = true
-      [resizable] = false
       (selectedCountry) = "onSelectedSpot($event)">
     </app-map-container>
   </div>

@@ -7,7 +7,6 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AppComponent implements OnInit{
   selectedSpot = 'Chile';
-  width: number = 400;
 
   ngOnInit(){
     // this.width = document.querySelector('body').offsetWidth;

@@ -7,14 +7,13 @@ import * as topojson from 'topojson';
   templateUrl: './map-container.component.html',
   styleUrls: ['./map-container.component.css']
 })
-export class MapContainerComponent implements OnInit, AfterContentInit {
-  @Input() width: any = 800;
-  @Input() height: any = 800;
+export class MapContainerComponent implements OnInit {
+  @Input() width: number;
+  @Input() height: number;
   @Input() scalable: boolean = true;
   @Input() clickable: boolean = true;
   @Input() showSelector: boolean = true;
   @Input() escZoomOut: boolean = false;
-  @Input() resizable: boolean = false;
   country: string = '';
   @Input('country') 
   set setCountry(value: string) {
@@ -24,15 +23,19 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
     }
   }
   @Output() selectedCountry = new EventEmitter<string>();
+  defaultWidth: number;
+  defaultHeight: number;
   svg: any;
   tooltip: any;
   g: any;
   projection: any;
   zoom: any;
+  rect: any;
   path: any;
   world: any;
   countries: any;
   select: any;
+  selectedPath: any;
   promise: Promise<any>;
   countryName: string = '';
   @HostListener('document:keydown', ['$event'])
@@ -45,17 +48,26 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
   constructor(private container: ElementRef) {}
 
   ngOnInit() {
+    if(!this.width) {
+      if((<HTMLElement>document.getElementsByClassName('mapDiv')[0]).offsetWidth > 0) {
+        this.width = (<HTMLElement>document.getElementsByClassName('mapDiv')[0]).offsetWidth;
+      } else {
+        this.width = 800;
+      }
+    }
+    if(!this.height) {
+      this.height = this.width;
+    }
+    console.log(this.width);
+    this.defaultWidth = this.width;
+    this.defaultHeight = this.height;
     const arr = [d3.json("../assets/world-50m.json"), d3.csv("../assets/countryIdName.csv")];
     this.promise = Promise.all(arr);
     this.promise.then((data:any) => this.ready(data));
+    this.draw();
   }
   
-  ngAfterContentInit() { 
-    this.height = parseInt(this.height);
-    this.width = parseInt(this.width);
-    if(this.height > this.width) {
-      this.height = this.width;
-    }
+  draw() { 
     this.projection = d3.geoMercator()
         .scale(this.width/6.3)
         .translate([this.width / 2, this.height / 1.6])
@@ -71,7 +83,7 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
         .attr("width", this.width)
         .attr("height", this.height)
         .on("click", this.stopped, true);
-    this.svg.append("rect")
+    this.rect = this.svg.append("rect")
         .attr("class", "background")
         .attr("width", this.width)
         .attr("height", this.height)
@@ -121,6 +133,7 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
   }
 
   clicked(d:any) {
+    this.selectedPath = d;
     this.svg.selectAll("path").classed("mesh", false); //reset mesh border color
     this.svg.selectAll("path").classed("countryActive", false); //reset country fill color
     this.svg.select('#id'+d.id).classed("countryActive", true); //set newly selected country fill color
@@ -156,6 +169,7 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
 
   reset() { //reset map color and zoom
     if(!this.clickable) return;
+    this.selectedPath = null;
     d3.selectAll("path").classed("mesh", false);
     d3.selectAll("path").classed("countryActive", false);
     this.svg.transition().duration(1000).call(this.zoom.transform, d3.zoomIdentity);
@@ -166,14 +180,6 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
   stopped() {
     if (d3.event.defaultPrevented) {
       d3.event.stopPropagation();
-    }
-  }
-
-  onResize() {
-    if(this.resizable) {
-      d3.select(".mapContainer").html('');
-      this.ngOnInit();
-      this.ngAfterContentInit();
     }
   }
 
@@ -191,5 +197,44 @@ export class MapContainerComponent implements OnInit, AfterContentInit {
         this.clicked(d);
       }
     });
+  }
+
+  redraw() {
+    this.projection = d3.geoMercator()
+        .scale(this.width/6.3)
+        .translate([this.width / 2, this.height / 1.6])
+        .rotate([-11,0]); //set the center for the map
+    this.path = d3.geoPath().projection(this.projection); 
+    this.svg
+        .attr("width", this.width)
+        .attr("height", this.height);
+    this.rect
+        .attr("width", this.width)
+        .attr("height", this.height);
+    this.g.selectAll("path")
+        .attr("d", this.path);
+    if(this.selectedPath) {
+      this.clicked(this.selectedPath);
+    } else {
+      this.reset();
+    }
+  }
+
+  onResize() {
+    if(this.defaultWidth > (<HTMLElement>document.getElementsByClassName('mapDiv')[0]).offsetWidth) {
+      if(this.width !== (<HTMLElement>document.getElementsByClassName('mapDiv')[0]).offsetWidth) {
+        this.width = (<HTMLElement>document.getElementsByClassName('mapDiv')[0]).offsetWidth;
+        if(this.defaultHeight > this.width) {
+          this.height = this.width;
+        }
+        this.redraw();
+      }
+    } else {
+      if (this.width !== this.defaultWidth) {
+        this.width = this.defaultWidth;
+        this.height = this.defaultHeight;
+        this.redraw();
+      }
+    } 
   }
 }

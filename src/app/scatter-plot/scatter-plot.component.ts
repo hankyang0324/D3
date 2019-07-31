@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterContentInit, Input, Output, EventEmitter, ElementRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ElementRef } from '@angular/core';
 import * as d3 from 'd3';
 
 @Component({
@@ -6,7 +6,7 @@ import * as d3 from 'd3';
   templateUrl: './scatter-plot.component.html',
   styleUrls: ['./scatter-plot.component.css']
 })
-export class ScatterPlotComponent implements OnInit, AfterContentInit {
+export class ScatterPlotComponent implements OnInit {
   @Output() selectedSpot = new EventEmitter<string>();
   defaultSpot: string;
   checkSpot: string; // For checking if the input spot is valid
@@ -19,17 +19,19 @@ export class ScatterPlotComponent implements OnInit, AfterContentInit {
       this.mouseover(result);
     }
   }
-  @Input('height') setHeight = 400;
-  @Input('width') setWidth = 480;
+  @Input('height') setHeight: number;
+  @Input('width') setWidth: number;
   @Input('color') setColor = 'steelblue';
   @Input() dataUrl: string;
   @Input() xValue: string = 'x';
   @Input() yValue: string = 'y';
   @Input() xRange = [0, 1];
   @Input() yRange = [0, 1];
-  margin = { left: 80, right: 100, top: 50, bottom: 50 };
-  height = 400 - this.margin.top - this.margin.bottom;
-  width = 480 - this.margin.left - this.margin.right;
+  margin = { left: 60, right: 40, top: 50, bottom: 50 };
+  defaultWidth: number;
+  defaultHeight: number;
+  height: number;
+  width: number;
   color = 'steelblue';
   svg: any;
   g: any;
@@ -46,19 +48,34 @@ export class ScatterPlotComponent implements OnInit, AfterContentInit {
   // Y-axis
   yAxisCall: any;
   yAxis: any;
+  // Reference line
+  refLineX1: any;
+  refLineX2: any;
+  refLineY1: any;
+  refLineY2: any;
   // Tooltip 
   tooltip: any;
   filteredData = [];
   promise: any;
+  tooltipSpot: any;
   t = () => d3.transition().duration(1000);
 
   constructor(private container: ElementRef) {}
 
   ngOnInit() {
+    if(!this.setWidth) {
+      if((<HTMLElement>document.getElementsByClassName('plot')[0]).offsetWidth > 0) {
+        this.setWidth = (<HTMLElement>document.getElementsByClassName('plot')[0]).offsetWidth;
+      } else {
+        this.setWidth = 800;
+      }
+    }
+    if(!this.setHeight) {
+      this.setHeight = this.setWidth;
+    }
+    this.defaultWidth = this.setWidth;
+    this.defaultHeight = this.setHeight;
     this.loadData();
-  }
-
-  ngAfterContentInit() {
     this.reset();
   }
 
@@ -104,23 +121,23 @@ export class ScatterPlotComponent implements OnInit, AfterContentInit {
     this.yAxis = this.g.append('g')
       .attr('class', 'y axis');
     // Reference lines
-    this.g.append('line')
+    this.refLineX1 = this.g.append('line')
       .attr('class', 'reference-line')
       .attr('x1', 0)
       .attr('x2', this.width);
-    this.g.append('line')
+    this.refLineX2 = this.g.append('line')
       .attr('class', 'reference-line')
       .attr('x1', 0)
       .attr('x2', this.width)
       .attr('y1', this.height / 2)
       .attr('y2', this.height / 2)
-    this.g.append('line')
+    this.refLineY1 = this.g.append('line')
       .attr('class', 'reference-line')
       .attr('x1', this.width / 2)
       .attr('x2', this.width / 2)
       .attr('y1', 0)
       .attr('y2', this.height);
-    this.g.append('line')
+    this.refLineY2 = this.g.append('line')
       .attr('class', 'reference-line')
       .attr('x1', this.width)
       .attr('x2', this.width)
@@ -192,6 +209,7 @@ export class ScatterPlotComponent implements OnInit, AfterContentInit {
   }
 
   mouseover(d) {
+    this.tooltipSpot = d;
     this.g.selectAll('.spot').classed('hover-spot', false);
     this.g.selectAll('.spot').classed('default-spot-hover', false);
     if (d.id === this.defaultSpot) {
@@ -223,4 +241,67 @@ export class ScatterPlotComponent implements OnInit, AfterContentInit {
     this.g.select('#id_' + d.id.split(' ').join('_')).classed('select-spot', false);
   }
 
+  redraw() {
+    this.height = this.setHeight - this.margin.top - this.margin.bottom;
+    this.width = this.setWidth - this.margin.left - this.margin.right;
+    this.x = d3.scaleLinear().range([0, this.width]);
+    this.y = d3.scaleLinear().range([this.height, 0]);
+    this.svg
+        .attr('width', this.width + this.margin.left + this.margin.right)
+        .attr('height', this.height + this.margin.top + this.margin.bottom);
+    this.g.attr('transform', 'translate(' + this.margin.left + ', ' + this.margin.top + ')');
+    // Labels
+    this.xLabel
+        .attr('y', this.height + 40)
+        .attr('x', this.width / 2);
+    this.yLabel
+        .attr('y', -50)
+        .attr('x', -this.height / 2);
+    // X-axis
+    this.xAxis.attr('transform', 'translate(0,' + this.height + ')');
+    // Reference lines
+    this.refLineX1
+        .attr('x1', 0)
+        .attr('x2', this.width);
+    this.refLineX2
+        .attr('x2', this.width)
+        .attr('y1', this.height / 2)
+        .attr('y2', this.height / 2);
+    this.refLineY1
+        .attr('x1', this.width / 2)
+        .attr('x2', this.width / 2)
+        .attr('y2', this.height);
+    this.refLineY2
+        .attr('x1', this.width)
+        .attr('x2', this.width)
+        .attr('y2', this.height);
+    // data
+    this.x.domain(this.xRange);
+    this.y.domain(this.yRange);
+    this.xAxisCall.scale(this.x);
+    this.xAxis.call(this.xAxisCall);
+    this.yAxisCall.scale(this.y);
+    this.yAxis.call(this.yAxisCall);
+    this.g.selectAll('.spot')
+        .attr('transform', d => 'translate(' + this.x(d[this.xValue]) + ', ' + this.y(d[this.yValue]) + ')');
+    this.mouseover(this.tooltipSpot);
+  }
+
+  onResize() {
+    if(this.defaultWidth > (<HTMLElement>document.getElementsByClassName('plot')[0]).offsetWidth) {
+      if(this.setWidth !== (<HTMLElement>document.getElementsByClassName('plot')[0]).offsetWidth) {
+        this.setWidth = (<HTMLElement>document.getElementsByClassName('plot')[0]).offsetWidth;
+        if(this.defaultHeight > this.setWidth) {
+          this.setHeight = this.setWidth;
+        }
+        this.redraw();
+      }
+    } else {
+      if (this.setWidth !== this.defaultWidth) {
+        this.setWidth = this.defaultWidth;
+        this.setHeight = this.defaultHeight;
+        this.redraw();
+      }
+    } 
+  }
 }
