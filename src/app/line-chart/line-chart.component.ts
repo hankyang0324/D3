@@ -76,17 +76,19 @@ export class LineChartComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     if (!this.setWidth) {
-      if ((<HTMLElement>document.getElementsByClassName('chart')[0]).offsetWidth > 0) {
-        this.setWidth = (<HTMLElement>document.getElementsByClassName('chart')[0]).offsetWidth;
+      if ((<HTMLElement>this.container.nativeElement.getElementsByClassName('chart')[0]).offsetWidth > 0) {
+        this.setWidth = (<HTMLElement>this.container.nativeElement.getElementsByClassName('chart')[0]).offsetWidth;
       } else {
         this.setWidth = 800;
       }
+    } else {
+      this.defaultWidth = this.setWidth;
     }
     if (!this.setHeight) {
-      this.setHeight = this.setWidth / 2;
+      this.setHeight = this.setWidth / 3;
+    } else {
+      this.defaultHeight = this.setHeight;
     }
-    this.defaultWidth = this.setWidth;
-    this.defaultHeight = this.setHeight;
     this.loadData();
     this.reset();
   }
@@ -143,6 +145,8 @@ export class LineChartComponent implements OnInit, OnDestroy {
       .attr('class', 'button')
       .on('click', (d, i, n) => onClick.bind(this)(30, i, n));
     button.append('rect')
+      .attr('height', 18)
+      .attr('width', 30)
       .attr('x', '35')
       .attr('y', '-13');
     button.append('text')
@@ -153,6 +157,8 @@ export class LineChartComponent implements OnInit, OnDestroy {
       .attr('class', 'button')
       .on('click', (d, i, n) => onClick.bind(this)(91, i, n));
     button.append('rect')
+      .attr('height', 18)
+      .attr('width', 30)
       .attr('x', '70')
       .attr('y', '-13');
     button.append('text')
@@ -163,6 +169,8 @@ export class LineChartComponent implements OnInit, OnDestroy {
       .attr('class', 'button')
       .on('click', (d, i, n) => onClick.bind(this)(183, i, n));
     button.append('rect')
+      .attr('height', 18)
+      .attr('width', 30)
       .attr('x', '105')
       .attr('y', '-13');
     button.append('text')
@@ -173,6 +181,8 @@ export class LineChartComponent implements OnInit, OnDestroy {
       .attr('class', 'button')
       .on('click', (d, i, n) => onClick.bind(this)(365, i, n));
     button.append('rect')
+      .attr('height', 18)
+      .attr('width', 30)
       .attr('x', '140')
       .attr('y', '-13');
     button.append('text')
@@ -183,6 +193,8 @@ export class LineChartComponent implements OnInit, OnDestroy {
       .attr('class', 'button')
       .on('click', (d, i, n) => onClick.bind(this)(0, i, n));
     button.append('rect')
+      .attr('height', 18)
+      .attr('width', 30)
       .attr('x', '175')
       .attr('y', '-13');
     button.append('text')
@@ -613,9 +625,12 @@ export class LineChartComponent implements OnInit, OnDestroy {
     this.xAxisCall2.scale(this.x2);
     this.xAxis2.call(this.xAxisCall2);
     // tooltips
+    this.g.select('.dateTip')
+      .select('line')
+      .attr('y2', this.height);
     this.g.select('.dateTip').style('display', 'none');
     this.g.selectAll('.focus').style('display', 'none');
-    //Brush
+    // Brush
     const begin = this.x2(this.xRange[0]);
     const end = this.x2(this.xRange[1]);
     this.svg2.selectAll('.brush').remove();
@@ -641,18 +656,12 @@ export class LineChartComponent implements OnInit, OnDestroy {
   }
 
   onResize() {
-    if (this.defaultWidth > (<HTMLElement>document.getElementsByClassName('chart')[0]).offsetWidth) {
-      if (this.setWidth !== (<HTMLElement>document.getElementsByClassName('chart')[0]).offsetWidth) {
-        this.setWidth = (<HTMLElement>document.getElementsByClassName('chart')[0]).offsetWidth;
-        if (this.defaultHeight > this.setWidth) {
-          this.setHeight = this.setWidth;
+    if (!this.defaultWidth) {
+      if (this.setWidth !== (<HTMLElement>this.container.nativeElement.getElementsByClassName('chart')[0]).offsetWidth) {
+        this.setWidth = (<HTMLElement>this.container.nativeElement.getElementsByClassName('chart')[0]).offsetWidth;
+        if (!this.defaultHeight) {
+          this.setHeight = this.setWidth / 3;
         }
-        this.redraw();
-      }
-    } else {
-      if (this.setWidth !== this.defaultWidth) {
-        this.setWidth = this.defaultWidth;
-        this.setHeight = this.defaultHeight;
         this.redraw();
       }
     }

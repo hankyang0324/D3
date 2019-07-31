@@ -5,7 +5,7 @@
 }
 .date-picker {
     position: relative;
-    top: 42px;
+    top: 40px;
     float: right;
     margin-right: 100px;
     font: 12px sans-serif;
@@ -16,8 +16,6 @@
 }
 
 :host ::ng-deep .button rect {
-    height: 18px;
-    width: 30px;
     cursor: pointer;
     fill: lightgrey;
     opacity: 0.3;

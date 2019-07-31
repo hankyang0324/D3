@@ -64,17 +64,19 @@ export class ScatterPlotComponent implements OnInit {
 
   ngOnInit() {
     if(!this.setWidth) {
-      if((<HTMLElement>document.getElementsByClassName('plot')[0]).offsetWidth > 0) {
-        this.setWidth = (<HTMLElement>document.getElementsByClassName('plot')[0]).offsetWidth;
+      if((<HTMLElement>this.container.nativeElement.getElementsByClassName('plot')[0]).offsetWidth > 0) {
+        this.setWidth = (<HTMLElement>this.container.nativeElement.getElementsByClassName('plot')[0]).offsetWidth;
       } else {
         this.setWidth = 800;
       }
+    } else {
+      this.defaultWidth = this.setWidth;
     }
     if(!this.setHeight) {
       this.setHeight = this.setWidth;
+    } else {
+      this.defaultHeight = this.setHeight;
     }
-    this.defaultWidth = this.setWidth;
-    this.defaultHeight = this.setHeight;
     this.loadData();
     this.reset();
   }
@@ -288,20 +290,14 @@ export class ScatterPlotComponent implements OnInit {
   }
 
   onResize() {
-    if(this.defaultWidth > (<HTMLElement>document.getElementsByClassName('plot')[0]).offsetWidth) {
-      if(this.setWidth !== (<HTMLElement>document.getElementsByClassName('plot')[0]).offsetWidth) {
-        this.setWidth = (<HTMLElement>document.getElementsByClassName('plot')[0]).offsetWidth;
-        if(this.defaultHeight > this.setWidth) {
-          this.setHeight = this.setWidth;
+    if (!this.defaultWidth) {
+      if (this.setWidth !== (<HTMLElement>this.container.nativeElement.getElementsByClassName('plot')[0]).offsetWidth) {
+        this.setWidth = (<HTMLElement>this.container.nativeElement.getElementsByClassName('plot')[0]).offsetWidth;
+        if (!this.defaultHeight) {
+          this.setHeight = this.setWidth / 3;
         }
         this.redraw();
       }
-    } else {
-      if (this.setWidth !== this.defaultWidth) {
-        this.setWidth = this.defaultWidth;
-        this.setHeight = this.defaultHeight;
-        this.redraw();
-      }
-    } 
+    }
   }
 }

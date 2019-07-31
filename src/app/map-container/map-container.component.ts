@@ -49,18 +49,19 @@ export class MapContainerComponent implements OnInit {
 
   ngOnInit() {
     if(!this.width) {
-      if((<HTMLElement>document.getElementsByClassName('mapDiv')[0]).offsetWidth > 0) {
-        this.width = (<HTMLElement>document.getElementsByClassName('mapDiv')[0]).offsetWidth;
+      if((<HTMLElement>this.container.nativeElement.getElementsByClassName('mapDiv')[0]).offsetWidth > 0) {
+        this.width = (<HTMLElement>this.container.nativeElement.getElementsByClassName('mapDiv')[0]).offsetWidth;
       } else {
         this.width = 800;
       }
+    } else {
+      this.defaultWidth = this.width;
     }
     if(!this.height) {
       this.height = this.width;
+    } else {
+      this.defaultHeight = this.height;
     }
-    console.log(this.width);
-    this.defaultWidth = this.width;
-    this.defaultHeight = this.height;
     const arr = [d3.json("../assets/world-50m.json"), d3.csv("../assets/countryIdName.csv")];
     this.promise = Promise.all(arr);
     this.promise.then((data:any) => this.ready(data));
@@ -113,7 +114,7 @@ export class MapContainerComponent implements OnInit {
           selectCountry.on("click", this.clicked.bind(this)); // delete this line to disable free click
         } 
         this.onSelect(this.country); 
-        document.querySelector('select').style.maxWidth = this.width + 'px';  
+        this.container.nativeElement.querySelector('select').style.maxWidth = this.width + 'px';  
       }
     )
   }
@@ -221,20 +222,14 @@ export class MapContainerComponent implements OnInit {
   }
 
   onResize() {
-    if(this.defaultWidth > (<HTMLElement>document.getElementsByClassName('mapDiv')[0]).offsetWidth) {
-      if(this.width !== (<HTMLElement>document.getElementsByClassName('mapDiv')[0]).offsetWidth) {
-        this.width = (<HTMLElement>document.getElementsByClassName('mapDiv')[0]).offsetWidth;
-        if(this.defaultHeight > this.width) {
+    if (!this.defaultWidth) {
+      if (this.width !== (<HTMLElement>this.container.nativeElement.getElementsByClassName('mapDiv')[0]).offsetWidth) {
+        this.width = (<HTMLElement>this.container.nativeElement.getElementsByClassName('mapDiv')[0]).offsetWidth;
+        if (!this.defaultHeight) {
           this.height = this.width;
         }
         this.redraw();
       }
-    } else {
-      if (this.width !== this.defaultWidth) {
-        this.width = this.defaultWidth;
-        this.height = this.defaultHeight;
-        this.redraw();
-      }
-    } 
+    }
   }
 }
